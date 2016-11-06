@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Login_Rememberme</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="button_login">Login</string>
+    <string name="checkbox_remember_me">Remember me?</string>
+    <string name="error_invalid_password">The password should be longer than 3 letters</string>
+    <string name="error_invalid_input">The input is invalid.</string>
+    <string name="title_activity_login_successful">LoginSuccessfulActivity</string>
+    <string name="login_successful">Welcome to the post-login activity!</string>
+    <string name="button_logout">Logout</string>
+</resources>
