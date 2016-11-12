@@ -1,4 +1,4 @@
-package com.example.sugitatakuto.login_rememberme;
+package com.example.sugitatakuto.login_rememberme.com.example.sugitatakuto.login_rememberme.activity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+
+import com.example.sugitatakuto.login_rememberme.R;
 
 public class LoginSuccessfulActivity extends AppCompatActivity {
 

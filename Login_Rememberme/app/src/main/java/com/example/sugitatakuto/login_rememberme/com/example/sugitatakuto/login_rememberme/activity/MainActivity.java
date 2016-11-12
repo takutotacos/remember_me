@@ -1,4 +1,4 @@
-package com.example.sugitatakuto.login_rememberme;
+package com.example.sugitatakuto.login_rememberme.com.example.sugitatakuto.login_rememberme.activity;
 
 
 import android.content.Context;
@@ -11,29 +11,25 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+import com.example.sugitatakuto.login_rememberme.R;
+import com.example.sugitatakuto.login_rememberme.com.example.sugitatakuto.login_rememberme.asyncHttp.AsyncOkHttp;
+import com.example.sugitatakuto.login_rememberme.com.example.sugitatakuto.login_rememberme.asyncHttp.AsyncResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AsyncResponse {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String USER_TOKEN_KEY = "userTokenKey";
-
     private SharedPreferences sharedPreferences;
     SharedPreferences.Editor sharedPreferencesEditor;
     private EditText mEditTextEmail, mEditTextPassword;
     private Button mLoginButton;
     private CheckBox mCheckBoxRememberMe;
+    AsyncOkHttp asyncOkHttp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             // There was a validation error. Dont attempt login and focus the first form element with an error.
             focusView.requestFocus();
         } else {
-            sendLoginRequest(email, password);
+            new AsyncOkHttp(this).execute(email, password);
         }
     }
 
@@ -115,59 +111,25 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+    @Override
+    public void processFinish(JSONObject output) {
 
-    private void sendLoginRequest(final String email, final String password) {
-        RequestQueue mRequestQueue = Volley.newRequestQueue(this);
-        JSONObject joLoginRequest = new JSONObject();
-        try {
-            joLoginRequest.put("email", email);
-            joLoginRequest.put("password", password);
-            String url = "http://127.0.0.2/db_connection.php";
-
-            JsonObjectRequest jsObjRequest = new JsonObjectRequest(
-                    Request.Method.POST, url, joLoginRequest,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            processLoginResponse(response, password);
-                        }
-                    }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                error.printStackTrace();
-                                try {
-                                    Toast.makeText(MainActivity.this, "Wrong email/password combination.", Toast.LENGTH_LONG).show();
-                                } catch (NullPointerException e) {
-                                    Log.e(TAG, e.getLocalizedMessage(), e);
-                                }
-                            }
-                        });
-                    mRequestQueue.add(jsObjRequest);
-                } catch(JSONException e) {
-                    e.printStackTrace();
-                }
+        if(output != null) {
+            String email = null;
+            try {
+                email = output.getString("email");
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-
-    private void processLoginResponse(JSONObject loginResponse, String successfulPassword) {
-        Log.i(TAG, "Got Login Response: ¥n" + loginResponse.toString());
-        try {
-            Log.i(TAG, "Data found!!!!!!: n¥" + loginResponse.getString("email"));
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            if(loginResponse != null) {
-                if(mCheckBoxRememberMe.isChecked()) {
-                    System.out.println("The checkbox was checked...");
-                    // @TODO What value to be stored.
-                    sharedPreferencesEditor.putString(USER_TOKEN_KEY, loginResponse.getString("email"));
-                    sharedPreferencesEditor.commit();
-                }
-                startPostLoginActivity();
-                finish();
+            if (mCheckBoxRememberMe.isChecked()) {
+                sharedPreferencesEditor.putString(USER_TOKEN_KEY, email);
+                sharedPreferencesEditor.commit();
             }
-        }  catch (Exception e) {
-            e.printStackTrace();
+            startPostLoginActivity();
+            finish();
+        } else {
+            System.out.println("Got the null data or status code suggesting not 'OK'");
         }
     }
+
 }
